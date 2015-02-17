@@ -29,14 +29,14 @@ game_stack = []
 def run():
     pygame.init()
 
-    resolution = 1024, 768
+    resolution = 900, 1092/2
     screen = pygame.display.set_mode(resolution)
     screen_rect = screen.get_rect()
 
     clock = pygame.time.Clock()
     max_fps = 0
 
-    push(Menu())
+    push(start())
     while top():
         dt = clock.tick(max_fps) / 1000.0
 
@@ -46,7 +46,4 @@ def run():
 
 
 if __name__ == '__main__':
-    main()
-    startScreen()
-    scoreBoard()
     run()

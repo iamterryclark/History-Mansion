@@ -9,45 +9,45 @@ from pygame.locals import *
 
 class startScreen():
     
-    mygame = game()
+    def __init__(self):
+        self.WINDOWWIDTH = (1800/2)
+        self.WINDOWHEIGHT = (1092/2)
+        self.FPS = 40
     
-    WINDOWWIDTH = (1800/2)
-    WINDOWHEIGHT = (1092/2)
-    FPS = 40
+        #Colors     R    G    B
+        self.WHITE =   ( 255, 255, 255 )
+        self.BLACK =   (   0,   0,   0 )
+        self.BROWN =   ( 180, 120,  40 )
     
-    #Colors     R    G    B
-    WHITE =   ( 255, 255, 255 )
-    BLACK =   (   0,   0,   0 )
-    BROWN =   ( 180, 120,  40 )
+        #Set In Game colors and assets
+        self.BGCOLOR = BLACK
+        self.BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/mansion.jpg")
+        self.BORDERCOLOR = BROWN
     
-    #Set In Game colors and assets
-    BGCOLOR = BLACK
-    BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/mansion.jpg")
-    BORDERCOLOR = BROWN
+        #Font
+        self.BASICFONTSIZE = 45 
     
-    #Font
-    BASICFONTSIZE = 45 
-    
-    #Button Attributes
-    BUTTONTEXTCOLOR = WHITE
-    
-    
+        #Button Attributes
+        self.BUTTONTEXTCOLOR = WHITE
+        
+        self.BASICFONT = pygame.font.SysFont("monospace", BASICFONTSIZE, bold=True, italic = True)
+        self.startSOUND = pygame.mixer.Sound("Assets/Audio/Mansion.wav")
     
     def startScreen():
-        global FPSCLOCK, DISPLAYSURF, BASICFONT, TILESOUND, WINSOUND, NEW_SURF, NEW_RECT, RESET_SURF, RESET_RECT, SOLVE_SURF, SOLVE_RECT,  EXIT_SURF, EXIT_RECT, TIMERSURF, TIMERRECT, RANDCHAR, moves 
+        global FPSCLOCK, DISPLAYSURF, BASICFONT, TILESOUND, WINSOUND, NEW_SURF, NEW_RECT, RESET_SURF, RESET_RECT, SOLVE_SURF, SOLVE_RECT,  EXIT_SURF, EXIT_RECT, moves 
     
         # Initialise screen
-        pygame.init()
-        DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
         pygame.display.set_caption('History Mansion')
-        BASICFONT = pygame.font.SysFont("monospace", BASICFONTSIZE, bold=True, italic = True)
-        startSOUND = pygame.mixer.Sound("Assets/Audio/Mansion.wav")
-    
+        
         # Fill background
         background = pygame.Surface(DISPLAYSURF.get_size())
         background = background.convert()
         background.blit(BGIMAGE, (0,0))
         startSOUND.play()
+        
+    def draw(self, dt): 
+        DISPLAYSURF = pygame.display.get_surface()
+        DISPLAYSURF.fill((0, 0, 0))
         
         #Option buttons
         START_SURF, START_RECT = makeText('Start Game', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 300)
@@ -62,7 +62,11 @@ class startScreen():
         pygame.display.flip()
         
     #/---Event loop---\#
-    
+    def think(self, dt):
+        self.upate(dt)
+        self.draw(dt)
+ 
+    def update(self, dt):
         while True:
             checkForQuit()
             for event in pygame.event.get():
@@ -77,8 +81,7 @@ class startScreen():
     
             pygame.display.flip()
             
-    #/-----In Game Functions-----\#
-    
+    #/-----In Game Functions-----\#       
     def terminate():
         pygame.quit()
         sys.exit()
@@ -97,5 +100,6 @@ class startScreen():
         textRect.midbottom = (centerx, height)
         return (textSurf, textRect)
     
-    if __name__ == '__main__': 
+    if __name__ == '__main__':
         startScreen()
+     

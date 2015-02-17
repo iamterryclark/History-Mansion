@@ -5,9 +5,6 @@
 
 import pygame, sys, random, os, pygame.mixer
 from pygame.locals import *
-
-    #class game:
-    #global WINDOWWIDTH, WINDOWHEIGHT
     
 #Set constants (These will change dependent on different levels)
 BOARDWIDTH = (4) #Number of columns on the board
@@ -57,43 +54,12 @@ DOWN = 'down'
 LEFT = 'left'
 RIGHT = 'right'
 
-"""def __init__(self):
-    
-    self.BOARDWIDTH = 4
-    self.BOARDHEIGHT = 4
-    self.TILESIZE = 80
-    self.WINDOWWIDTH = 900
-    self.WINDOWHEIGHT = (1092/2)
-    self.FPS = 40
-    self.BLANK =  None
-    self.BGCOLOR = Color(0,0,0,0)
-    self.BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/fireplace.jpg")
-    self.BORDERCOLOR = Color(180,120,40)
-    self.BASICFONTSIZE = 27
-    self.BUTTONTEXTCOLOR = Color(255,255,255)
-    self.MESSAGEBOX = Color(0,0,0,0)
-    self.MESSAGECOLOR = Color(255,255,255)
-    self.FPSCLOCK = pygame.time.Clock()
-    self.DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    self.CHAR = ('flo','geng','ghandi','henry','queen','cleo')
-    self.RANDCHAR = random.choice(CHAR) 
-    self.BASICFONT = pygame.font.SysFont("monospace", BASICFONTSIZE)
-    self.TILESOUND = pygame.mixer.Sound("Assets/Audio/slide.wav")
-    self.WINSOUND = pygame.mixer.Sound("Assets/Audio/win.wav")
-    self.moves = 0
-    self.XMARGIN = int((WINDOWWIDTH - (TILESIZE * BOARDWIDTH + (BOARDWIDTH - 1))) / 2)
-    self.YMARGIN = int((WINDOWHEIGHT - (TILESIZE * BOARDHEIGHT + (BOARDHEIGHT - 1))) / 2)
-    self.UP = 'up'
-    self.DOWN = 'down'
-    self.LEFT = 'left'
-    self.RIGHT = 'right'"""
-
 #-------Initialise board------#
 
 def main ():
     global FPSCLOCK, DISPLAYSURF, BASICFONT, TILESOUND, WINSOUND, NEW_SURF, NEW_RECT, RESET_SURF, RESET_RECT, SOLVE_SURF, SOLVE_RECT,  EXIT_SURF, EXIT_RECT, TIMERSURF, TIMERRECT, RANDCHAR, moves 
     
-    pygame.init()
+    #pygame.init()
     pygame.display.set_caption('History Mansion')
     
     #Option buttons
@@ -383,18 +349,8 @@ def resetAnimation(board, allMoves):
             
         slideAnimation(board, oppositeMove, '', animationSpeed=int(TILESIZE / 2 ))
         makeMove(board, oppositeMove)
-        
-def addScore():
-    return None
-    
-def funFactRelease():
-    if getStartingBoard(board[:4]) == range(4):
-        msg = ""
-   
-        
-if __name__ == '__main__':
-    main()
-        
+
+
         
         
         
