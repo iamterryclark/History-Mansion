@@ -6,7 +6,6 @@
 import pygame, sys
 from pygame.locals import *
 
-
 class startScreen():
     
     def __init__(self):
@@ -20,22 +19,20 @@ class startScreen():
         self.BROWN =   ( 180, 120,  40 )
     
         #Set In Game colors and assets
-        self.BGCOLOR = BLACK
+        self.BGCOLOR = self.BLACK
         self.BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/mansion.jpg")
-        self.BORDERCOLOR = BROWN
+        self.BORDERCOLOR = self.BROWN
     
         #Font
         self.BASICFONTSIZE = 45 
     
         #Button Attributes
-        self.BUTTONTEXTCOLOR = WHITE
+        self.BUTTONTEXTCOLOR = self.WHITE
         
-        self.BASICFONT = pygame.font.SysFont("monospace", BASICFONTSIZE, bold=True, italic = True)
+        self.BASICFONT = pygame.font.SysFont("monospace", self.BASICFONTSIZE, bold=True, italic = True)
         self.startSOUND = pygame.mixer.Sound("Assets/Audio/Mansion.wav")
     
-    def startScreen():
-        global FPSCLOCK, DISPLAYSURF, BASICFONT, TILESOUND, WINSOUND, NEW_SURF, NEW_RECT, RESET_SURF, RESET_RECT, SOLVE_SURF, SOLVE_RECT,  EXIT_SURF, EXIT_RECT, moves 
-    
+    def startScreen(): 
         # Initialise screen
         pygame.display.set_caption('History Mansion')
         
@@ -63,7 +60,7 @@ class startScreen():
         
     #/---Event loop---\#
     def think(self, dt):
-        self.upate(dt)
+        self.update(dt)
         self.draw(dt)
  
     def update(self, dt):
@@ -100,6 +97,6 @@ class startScreen():
         textRect.midbottom = (centerx, height)
         return (textSurf, textRect)
     
-    if __name__ == '__main__':
-        startScreen()
+if __name__ == '__main__':
+    startScreen()
      

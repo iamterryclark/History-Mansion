@@ -3,7 +3,7 @@
 #Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
 #Released under a "Simplified BSD" License
 
-import pygame
+import pygame, startScreen
 from pygame.locals import *
 
 def push(context):
@@ -36,7 +36,7 @@ def run():
     clock = pygame.time.Clock()
     max_fps = 0
 
-    push(start())
+    push(startScreen.startScreen())
     while top():
         dt = clock.tick(max_fps) / 1000.0
 
