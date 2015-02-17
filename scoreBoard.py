@@ -80,4 +80,4 @@ def makeText(text, color, top, left):
     return (textSurf, textRect)
 
 if __name__ == '__main__': 
-    scoreBoard()
+    

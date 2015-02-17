@@ -36,24 +36,23 @@ class startScreen():
         # Initialise screen
         pygame.display.set_caption('History Mansion')
         
+    def draw(self, dt): 
+        DISPLAYSURF = pygame.display.get_surface()
+        
         # Fill background
         background = pygame.Surface(DISPLAYSURF.get_size())
         background = background.convert()
         background.blit(BGIMAGE, (0,0))
         startSOUND.play()
         
-    def draw(self, dt): 
-        DISPLAYSURF = pygame.display.get_surface()
-        DISPLAYSURF.fill((0, 0, 0))
-        
         #Option buttons
-        START_SURF, START_RECT = makeText('Start Game', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 300)
-        SCOREBOARD_SURF, SCOREBOARD_RECT = makeText('Score Board', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 350)
-        EXIT_SURF, EXIT_RECT = makeText('Exit', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 400)
+        self.START_SURF, self.START_RECT = makeText('Start Game', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 300)
+        self.SCOREBOARD_SURF, self.SCOREBOARD_RECT = makeText('Score Board', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 350)
+        self.EXIT_SURF, self.EXIT_RECT = makeText('Exit', BUTTONTEXTCOLOR, WINDOWWIDTH/2, 400)
     
         # Blit everything to the screen
         DISPLAYSURF.blit(background, (0, 0))
-        DISPLAYSURF.blit(START_SURF, START_RECT)
+        DISPLAYSURF.blit(self.START_SURF, START_RECT)
         DISPLAYSURF.blit(SCOREBOARD_SURF, SCOREBOARD_RECT)
         DISPLAYSURF.blit(EXIT_SURF, EXIT_RECT)
         pygame.display.flip()
@@ -65,38 +64,35 @@ class startScreen():
  
     def update(self, dt):
         while True:
-            checkForQuit()
+            self.checkForQuit()
             for event in pygame.event.get():
                 if event.type == MOUSEBUTTONUP:
                     if START_RECT.collidepoint(event.pos): #user clicked New button
-                        mygame.main()
+                        push(game.game())
                         return True
                     elif SCOREBOARD_RECT.collidepoint(event.pos):
                         return True
                     elif EXIT_RECT.collidepoint(event.pos):
-                        terminate()
+                        self.terminate()
     
             pygame.display.flip()
             
     #/-----In Game Functions-----\#       
-    def terminate():
+    def terminate(self):
         pygame.quit()
         sys.exit()
         
-    def checkForQuit():
+    def checkForQuit(self):
         for event in pygame.event.get(QUIT): #get all the QUIT events
-            terminate()
+            self.terminate()
         for event in pygame.event.get(KEYUP): #get all the KEYUP events
             if event.key == K_ESCAPE:
-                terminate() #if ESC key pressed
+                self.terminate() #if ESC key pressed
             pygame.event.post(event) #put all KEYUP event objects back
             
-    def makeText(text, color, centerx, height):
+    def makeText(self, text, color, centerx, height):
         textSurf = BASICFONT.render(text, True, color)
         textRect = textSurf.get_rect()
         textRect.midbottom = (centerx, height)
         return (textSurf, textRect)
-    
-if __name__ == '__main__':
-    startScreen()
      
