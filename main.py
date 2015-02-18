@@ -9,7 +9,6 @@ from pygame.locals import *
 def push(context):
     game_stack.append(context)
 
-
 def pop():
     try:
         game_stack.pop()

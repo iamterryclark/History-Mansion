@@ -67,9 +67,9 @@ class startScreen():
                 if self.START_RECT.collidepoint(event.pos): #user clicked start button
                     game.game()
                 elif self.SCOREBOARD_RECT.collidepoint(event.pos):#user clicked start button
-                    return True
+                    scoreBoard.scoreBoard()
                 elif self.EXIT_RECT.collidepoint(event.pos):
-                    pop(main())
+                    self.terminate()
     
             pygame.display.flip()
             
