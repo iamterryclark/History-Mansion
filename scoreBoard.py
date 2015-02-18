@@ -78,6 +78,3 @@ def makeText(text, color, top, left):
     textRect = textSurf.get_rect()
     textRect.topleft = (top, left)
     return (textSurf, textRect)
-
-if __name__ == '__main__': 
-    

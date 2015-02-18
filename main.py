@@ -16,7 +16,6 @@ def pop():
     except IndexError:
         pass
 
-
 def top():
     try:
         return game_stack[-1]
@@ -25,9 +24,9 @@ def top():
 
 game_stack = []
 
-
 def run():
     pygame.init()
+    pygame.display.set_caption('History Mansion')
 
     resolution = 900, 1092/2
     screen = pygame.display.set_mode(resolution)
