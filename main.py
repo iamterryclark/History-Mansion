@@ -3,25 +3,9 @@
 #Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
 #Released under a "Simplified BSD" License
 
-import pygame, startScreen
+import pygame, startScreen, game, scoreBoard
+from context import *
 from pygame.locals import *
-
-def push(context):
-    game_stack.append(context)
-
-def pop():
-    try:
-        game_stack.pop()
-    except IndexError:
-        pass
-
-def top():
-    try:
-        return game_stack[-1]
-    except IndexError:
-        return None
-
-game_stack = []
 
 def run():
     pygame.init()
@@ -38,10 +22,9 @@ def run():
     while top():
         dt = clock.tick(max_fps) / 1000.0
 
-        context = top()
-        if context:
-            context.think(dt)
-
+        top_context = top()
+        if top_context:
+            top_context.think(dt)
 
 if __name__ == '__main__':
     run()
