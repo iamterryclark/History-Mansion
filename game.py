@@ -3,7 +3,7 @@
 #Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
 #Released under a "Simplified BSD" License
 
-import pygame, sys, random, os, pygame.mixer, startScreen, main
+import pygame, sys, random, os, pygame.mixer, startScreen
 from context import *
 from pygame.locals import *
  
@@ -18,7 +18,7 @@ class game():
         self.WINDOWHEIGHT = 1092/2
         #self.FPS = 40
         self.BLANK = None
-        self.DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
+        DISPLAYSURF = pygame.display.set_mode((self.WINDOWWIDTH, self.WINDOWHEIGHT))
     
         #Set In Game colors and assets and fonts
         self.BGCOLOR = Color(0,0,0,0)
@@ -57,14 +57,16 @@ class game():
          
         #Load Sounds
         self.TILESOUND = pygame.mixer.Sound("Assets/Audio/slide.wav")
-        self.WINSOUND = pygame.mixer.Sound("Assets/Audio/win.wav")  
+        self.WINSOUND = pygame.mixer.Sound("Assets/Audio/win.wav")
+        self.DISPLAYSURF = pygame.display.get_surface() 
+  
     
     #-------Initialise board------#
     def update(self, dt): 
         #pygame.init()
         #FPSCLOCK = pygame.time.Clock()
         #pygame.display.set_caption('History Mansion')
-
+                 
         self.mainBoard, self.solutionSeq = self.generateNewPuzzle(80)
         self.SOLVEDBOARD = self.getStartingBoard() #same as starting board
         self.allMoves = [] #empty list to store all moves
@@ -74,7 +76,7 @@ class game():
         self.msg = 'Click tile or use arrows to slide.' #message to display in message box
         if self.mainBoard == self.SOLVEDBOARD:
             self.msg = 'Solved!'
-            #popup box
+            #popup box   
     
         self.checkForQuit()
         for event in pygame.event.get():
@@ -84,13 +86,13 @@ class game():
                 if (self.spotx, self.spoty) == (None, None):
                     #check if the user clicked on an option button?
                     if self.NEW_RECT.collidepoint(event.pos): #user clicked New button
-                        #Character select
+                        #Random character selection
                         self.CHAR = ('flo','geng','ghandi','henry','queen','cleo')
                         self.RANDCHAR = random.choice(self.CHAR)
                         #addScore()
                         self.moves = 0 
                         self.update()
-                    elif self.RESET_RECT.collidepoint(event.pos):
+                    elif self.RESET_RECT.collidepoint(event.pos):#user clicked Reset button
                         self.resetAnimation(self.mainBoard, self.allMoves) # clicked on Solve button
                         self.allMoves = []
                         self.moves = 0
@@ -120,27 +122,26 @@ class game():
                     self.TILESOUND.play()
                     self.moves += 1
                 elif event.key in (K_UP, K_w) and self.isValidMove(self.mainBoard, self.UP):
-                    self.slideTo = UP
+                    self.slideTo = self.UP
                     self.TILESOUND.play()
                     self.moves += 1
                 elif event.key in (K_DOWN, K_s) and self.isValidMove(self.mainBoard, self.DOWN):
                     self.slideTo = self.DOWN
                     self.TILESOUND.play()
                     self.moves += 1
-            
+    
         if self.slideTo:
             self.slideAnimation(self.mainBoard, self.slideTo, 'Click tile or use arrows to slide.', 8) #show slide on screen
             self.makeMove(self.mainBoard, self.slideTo)
             self.allMoves.append(self.slideTo) #records the slide
-            
         #pygame.display.update()
         #FPSCLOCK.tick(FPS)
             
     #-------In game functions--------#
     
     def draw(self, dt):
-        self.drawBoard(self.board, "", self.moves) 
-    
+        self.drawBoard(self.board, "", self.moves)
+        
     def think(self, dt):
         self.update(dt)
         self.draw(dt)
@@ -253,24 +254,26 @@ class game():
     #    self.backgroundFact = pygame.draw.rect(self.DISPLAYSURF, self.BORDERCOLOR,  )
     #    self.text1 = maketext()
     
-    def drawBoard(self, board, message, moves):    
-        self.DISPLAYSURF.blit(self.BGIMAGE, [0,0])    
+    def drawBoard(self, board, message, moves): 
+        DISPLAYSURF = pygame.display.get_surface() 
+
+        DISPLAYSURF.blit(self.BGIMAGE, [0,0])    
     
         if message:
-            self.background = pygame.Surface(self.DISPLAYSURF.get_size())
+            self.background = pygame.Surface(DISPLAYSURF.get_size())
             self.text = self.BASICFONT.render(message, 1, self.MESSAGECOLOR)
             self.textpos = self.text.get_rect()
             self.textpos.midbottom = self.background.get_rect().midbottom
-            self.DISPLAYSURF.blit(self.text, self.textpos)
+            DISPLAYSURF.blit(self.text, self.textpos)
         
         if moves >= 0:
             self.movesCount = self.BASICFONT.render("Moves taken: " + str(moves), 1, self.MESSAGECOLOR)
-            self.DISPLAYSURF.blit(self.movesCount, (10,10))
+            DISPLAYSURF.blit(self.movesCount, (10,10))
         
         for tilex in range(len(board)):
             for tiley in range(len(board[0])):
                 if board[tilex][tiley]:     
-                    self.drawTile(tilex, tiley-1, self.board[tilex][tiley])
+                    self.drawTile(tilex, tiley-1, board[tilex][tiley])
                    
         self.left, self.top = self.getLeftTopOfTile(0, -1)
         self.width = self.BOARDWIDTH * self.TILESIZE
@@ -278,9 +281,9 @@ class game():
         pygame.draw.rect(self.DISPLAYSURF, self.BORDERCOLOR, (self.left - 3, self.top - 3, self.width + 9, self.height + 9), 2)
         
         #funFact()
-        self.DISPLAYSURF.blit(self.RESET_SURF, self.RESET_RECT)
-        self.DISPLAYSURF.blit(self.NEW_SURF, self.NEW_RECT)
-        self.DISPLAYSURF.blit(self.EXIT_SURF, self.EXIT_RECT)
+        DISPLAYSURF.blit(self.RESET_SURF, self.RESET_RECT)
+        DISPLAYSURF.blit(self.NEW_SURF, self.NEW_RECT)
+        DISPLAYSURF.blit(self.EXIT_SURF, self.EXIT_RECT)
             
     def slideAnimation(self, board, direction, message, animationSpeed):
         #This does not check if valid move....
@@ -327,7 +330,7 @@ class game():
         #numSlides is the number of moves and this function will animate these moves
         self.sequence = []
         self.board = self.getStartingBoard()
-        #self.drawBoard(self.board, '', None, dt)
+        self.drawBoard(self.board, '', None)
         pygame.display.update()
         pygame.time.wait(500) #Pause for 500 milliseconds for effect
         self.lastMove = None

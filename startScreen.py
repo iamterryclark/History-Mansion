@@ -3,7 +3,7 @@
 #Date Created: 10/02/2015
 #Released under a "Simplified BSD" License
 
-import pygame, sys, game, scoreBoard, main 
+import pygame, sys, game, scoreBoard
 from context import *
 from pygame.locals import *
 
@@ -58,7 +58,7 @@ class startScreen():
                 if self.START_RECT.collidepoint(event.pos): #user clicked start button
                      push(game.game())
                 elif self.SCOREBOARD_RECT.collidepoint(event.pos):#user clicked start button
-                    push(scoreBoard)
+                    push(scoreBoard.scoreBoard())
                 elif self.EXIT_RECT.collidepoint(event.pos):
                     self.terminate()
     

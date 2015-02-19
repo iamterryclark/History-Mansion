@@ -7,75 +7,70 @@ import pygame, sys, startScreen
 from context import *
 from pygame.locals import *
 
-WINDOWWIDTH = (1800/2)
-WINDOWHEIGHT = (1092/2)
-FPS = 40
+class scoreBoard():
 
-#Colors     R    G    B
-WHITE =   ( 255, 255, 255 )
-BLACK =   (   0,   0,   0 )
-BROWN =   ( 180, 120,  40 )
-
-#Set In Game colors and assets
-BGCOLOR = BLACK
-BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/fireplace.jpg")
-BORDERCOLOR = BROWN
-
-#Font
-BASICFONTSIZE = 30 
-
-#Button Attributes
-BUTTONTEXTCOLOR = WHITE
-
-def scoreBoard():
-    global FPSCLOCK, DISPLAYSURF, BASICFONT, TILESOUND, WINSOUND, NEW_SURF, NEW_RECT, RESET_SURF, RESET_RECT, SOLVE_SURF, SOLVE_RECT,  EXIT_SURF, EXIT_RECT, TIMERSURF, TIMERRECT, RANDCHAR, moves 
-
-    # Initialise screen
-    pygame.init()
-    DISPLAYSURF = pygame.display.set_mode((WINDOWWIDTH, WINDOWHEIGHT))
-    pygame.display.set_caption('History Mansion')
-    BASICFONT = pygame.font.SysFont("monospace", BASICFONTSIZE, bold=True, italic = True)
-
-    # Fill background
-    background = pygame.Surface(DISPLAYSURF.get_size())
-    background = background.convert()
-    background.blit(BGIMAGE, (0,0))
+    def __init__(self):
+        self.WINDOWWIDTH = (1800/2)
+        self.WINDOWHEIGHT = (1092/2)
+        self.FPS = 40
+        
+        #Colors     R    G    B
+        self.WHITE =   ( 255, 255, 255 )
+        self.BLACK =   (   0,   0,   0 )
+        self.BROWN =   ( 180, 120,  40 )
+        
+        #Set In Game colors and assets
+        self.BGCOLOR = self.BLACK
+        self.BGIMAGE = pygame.image.load("Assets/images/Pictures/mansion/fireplace.jpg")
+        self.BORDERCOLOR = self.BROWN
+        
+        #Font
+        self.BASICFONTSIZE = 30 
+        self.BASICFONT = pygame.font.SysFont("monospace", self.BASICFONTSIZE, bold=True, italic = True)
+        
+        #Button Attributes
+        self.BUTTONTEXTCOLOR = self.WHITE
+        
+        #Option buttons
+        self.BACK_SURF, self.BACK_RECT = self.makeText('Back', self.BUTTONTEXTCOLOR, 10, self.WINDOWHEIGHT - 45)
     
-    #Option buttons
-    BACK_SURF, BACK_RECT = makeText('Back', BUTTONTEXTCOLOR, 10, WINDOWHEIGHT - 45)
-
-    # Blit everything to the screen
-    DISPLAYSURF.blit(background, (0, 0))
-    DISPLAYSURF.blit(BACK_SURF,BACK_RECT)
-    pygame.display.flip()
-    
-#/---Event loop---\#
-
-    while True:
-        checkForQuit()
+    def update(self, dt):    
+        self.checkForQuit()
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONUP:
-                if BACK_RECT.collidepoint(event.pos): #user clicked New button
-                    startScreen.startScreen()
-            
+                if self.BACK_RECT.collidepoint(event.pos): #user clicked New button
+                    pop()
+                
+        #pygame.display.flip()
+        
+    def draw(self, dt): 
+        
+        DISPLAYSURF = pygame.display.get_surface()       
+        # Blit everything to the screen
+        DISPLAYSURF.blit(self.BGIMAGE, (0, 0))
+        DISPLAYSURF.blit(self.BACK_SURF,self.BACK_RECT)
         pygame.display.flip()
+            
+    #/-----In Game Functions-----\#
+    def think(self, dt):
+        self.update(dt)
+        self.draw(dt) 
         
-#/-----In Game Functions-----\#
-
-def terminate():
-    pygame.quit()
-    sys.exit()
-    
-def checkForQuit():
-    for event in pygame.event.get(QUIT): #get all the QUIT events
-        terminate()
-    for event in pygame.event.get(KEYUP): #get all the KEYUP events
-        if event.key == K_ESCAPE:
-            terminate() #if ESC key pressed
-        pygame.event.post(event) #put all KEYUP event objects back
+    def terminate(self):
+        pygame.quit()
+        sys.exit()
         
-def makeText(text, color, top, left):
-    textSurf = BASICFONT.render(text, True, color)
-    textRect = textSurf.get_rect()
-    textRect.topleft = (top, left)
-    return (textSurf, textRect)
+    def checkForQuit(self):
+        for event in pygame.event.get(QUIT): #get all the QUIT events
+            self.terminate()
+        for event in pygame.event.get(KEYUP): #get all the KEYUP events
+            if event.key == K_ESCAPE:
+                self.terminate() #if ESC key pressed
+            pygame.event.post(event) #put all KEYUP event objects back
+            
+    def makeText(self, text, color, top, left):
+        #create the button objects
+        self.textSurf = self.BASICFONT.render(text, True, color)
+        self.textRect = self.textSurf.get_rect()
+        self.textRect.topleft = (top, left)
+        return (self.textSurf, self.textRect)
