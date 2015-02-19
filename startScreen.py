@@ -3,7 +3,8 @@
 #Date Created: 10/02/2015
 #Released under a "Simplified BSD" License
 
-import pygame, sys, game, scoreBoard
+import pygame, sys, game, scoreBoard, main 
+from context import *
 from pygame.locals import *
 
 class startScreen():
@@ -49,6 +50,22 @@ class startScreen():
         self.EXIT_SURF, self.EXIT_RECT = self.makeText('Exit', self.BUTTONTEXTCOLOR, self.WINDOWWIDTH/2, 400)
         self.startSOUND.play()
         
+    #/---Event loop function---\#
+    def update(self, dt):
+        self.checkForQuit()
+        for event in pygame.event.get():
+            if event.type == MOUSEBUTTONUP:
+                if self.START_RECT.collidepoint(event.pos): #user clicked start button
+                     push(game.game())
+                elif self.SCOREBOARD_RECT.collidepoint(event.pos):#user clicked start button
+                    push(scoreBoard)
+                elif self.EXIT_RECT.collidepoint(event.pos):
+                    self.terminate()
+    
+            #pygame.display.flip()
+            
+    #/-----In Game Functions-----\#
+    
     def draw(self, dt): 
         DISPLAYSURF = pygame.display.get_surface()
         
@@ -57,23 +74,8 @@ class startScreen():
         DISPLAYSURF.blit(self.START_SURF, self.START_RECT)
         DISPLAYSURF.blit(self.SCOREBOARD_SURF, self.SCOREBOARD_RECT)
         DISPLAYSURF.blit(self.EXIT_SURF, self.EXIT_RECT)
-        pygame.display.flip()
-        
-    #/---Event loop function---\#
-    def update(self, dt):
-        self.checkForQuit()
-        for event in pygame.event.get():
-            if event.type == MOUSEBUTTONUP:
-                if self.START_RECT.collidepoint(event.pos): #user clicked start button
-                    game.game()
-                elif self.SCOREBOARD_RECT.collidepoint(event.pos):#user clicked start button
-                    scoreBoard.scoreBoard()
-                elif self.EXIT_RECT.collidepoint(event.pos):
-                    self.terminate()
-    
-            pygame.display.flip()
-            
-    #/-----In Game Functions-----\# 
+        pygame.display.flip() 
+   
     def think(self, dt):
         self.update(dt)
         self.draw(dt) 
