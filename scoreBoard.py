@@ -3,7 +3,8 @@
 #Date Created: 10/02/2015
 #Released under a "Simplified BSD" License
 
-import pygame, sys
+import pygame, sys, startScreen
+from context import *
 from pygame.locals import *
 
 WINDOWWIDTH = (1800/2)
@@ -55,7 +56,7 @@ def scoreBoard():
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONUP:
                 if BACK_RECT.collidepoint(event.pos): #user clicked New button
-                    return True
+                    startScreen.startScreen()
             
         pygame.display.flip()
         
