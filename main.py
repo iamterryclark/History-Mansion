@@ -1,6 +1,5 @@
 #History Mansion - A history slider game
-#Edited and adapted By Terry Clark
-#Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
+#main.py created by Terry Clark
 #Released under a "Simplified BSD" License
 
 import pygame, startScreen, game, scoreBoard
@@ -11,9 +10,9 @@ def run():
     pygame.init()
     pygame.display.set_caption('History Mansion')
 
-    resolution = 900, 1092/2
+    resolution = 1100, 700
     screen = pygame.display.set_mode(resolution)
-    screen_rect = screen.get_rect()
+    #screen_rect = screen.get_rect()
 
     clock = pygame.time.Clock()
     max_fps = 0
@@ -26,5 +25,5 @@ def run():
         if top_context:
             top_context.think(dt)
 
-if __name__ == '__main__':
+if __name__ == '__main__':    
     run()
