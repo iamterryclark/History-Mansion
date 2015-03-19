@@ -12,7 +12,6 @@ def run():
 
     resolution = 1100, 700
     screen = pygame.display.set_mode(resolution)
-    #screen_rect = screen.get_rect()
 
     clock = pygame.time.Clock()
     max_fps = 0

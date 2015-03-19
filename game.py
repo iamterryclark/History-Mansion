@@ -3,17 +3,18 @@
 #Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
 #Released under a "Simplified BSD" License
 
-import pygame, sys, random, os, pygame.mixer, startScreen, submitScore, main
+import pygame, sys, random, os, pygame.mixer, startScreen, puzSubmitScore, quizSubmitScore
 from context import *
+import time
 from pygame.locals import *
  
 class game():
     
-    def __init__(self):  
+    def __init__(self, TILESIZE, BOARDWIDTH, BOARDHEIGHT):  
         #Set constants (These will change dependent on different levels)
-        self.BOARDWIDTH = 4 #Number of columns on the board
-        self.BOARDHEIGHT = 4#Number of rows on the board
-        self.TILESIZE = 80
+        self.BOARDWIDTH = BOARDWIDTH #Number of columns on the board
+        self.BOARDHEIGHT = BOARDHEIGHT #Number of rows on the board
+        self.TILESIZE = TILESIZE
         self.WINDOWWIDTH = 1100
         self.WINDOWHEIGHT = 700
         self.BLANK = None
@@ -24,17 +25,34 @@ class game():
         self.BORDERCOLOR = Color(180,120,40)
         
         self.BUTTONTEXTCOLOR = Color(255,255,255)
-        self.MESSAGEBOX = Color(0,0,0,0)
         self.MESSAGECOLOR = Color(255,255,255)
             
         #Score Calculations and Move Count
         self.moves = 0
-        self.topScore = self.BOARDWIDTH * self.BOARDHEIGHT * 100 
-        self.score = 0  
+        
+        if self.TILESIZE == 80:
+            self.topScore = self.BOARDWIDTH * self.BOARDHEIGHT * 100
+            self.randomNumber = random.randrange(100,150) 
+        
+        elif self.TILESIZE == 64:
+            self.topScore = self.BOARDWIDTH * self.BOARDHEIGHT * 100
+            self.randomNumber = random.randrange(200,250)
         
         #Setting a margin inside the board
         self.XMARGIN = int((self.WINDOWWIDTH - (self.TILESIZE * self.BOARDWIDTH + (self.BOARDWIDTH - 1))) / 2)
         self.YMARGIN = int((self.WINDOWHEIGHT - (self.TILESIZE * self.BOARDHEIGHT + (self.BOARDHEIGHT - 1))) / 2)
+                    
+        #Option buttons
+        self.NEW_SURF, self.NEW_RECT = self.makeText('New Game', self.BUTTONTEXTCOLOR, 30, self.WINDOWWIDTH - 200, 10)
+        self.RESET_SURF, self.RESET_RECT = self.makeText('Reset Game', self.BUTTONTEXTCOLOR, 30, self.WINDOWWIDTH - 200, 40)
+        self.EXIT_SURF, self.EXIT_RECT = self.makeText('Main Menu', self.BUTTONTEXTCOLOR, 30, self.WINDOWWIDTH - 200, 70)
+  
+        #Character select
+        self.CHAR = ('flo','geng','ghandi','henry','queen','cleo')
+        self.RANDCHAR = random.choice(self.CHAR) 
+        
+        #Load Sound
+        self.TILESOUND = pygame.mixer.Sound("Assets/Audio/slide.wav")
         
         #Directions
         self.UP = 'up'
@@ -42,32 +60,10 @@ class game():
         self.LEFT = 'left'
         self.RIGHT = 'right'
         
-        self.BASICFONT = pygame.font.SysFont("monospace", 30, bold=True, italic = True)
-        self.factFONT = pygame.font.SysFont("monospace", 25, bold=True, italic = True)
-            
-        #Option buttons
-        self.NEW_SURF, self.NEW_RECT = self.makeText('New Game', self.BUTTONTEXTCOLOR, self.WINDOWWIDTH - 200, 10)
-        self.RESET_SURF, self.RESET_RECT = self.makeText('Reset Game', self.BUTTONTEXTCOLOR, self.WINDOWWIDTH - 200, 40)
-        self.EXIT_SURF, self.EXIT_RECT = self.makeText('Main Menu', self.BUTTONTEXTCOLOR, self.WINDOWWIDTH - 200, 70)
-  
-        #Character select
-        self.CHAR = ('flo','geng','ghandi','henry','queen','cleo')
-        self.RANDCHAR = "cleo" #random.choice(self.CHAR) 
-        
-        self.randomNumber = random.randrange(100,150)
-        
-        #Load Sounds
-        self.TILESOUND = pygame.mixer.Sound("Assets/Audio/slide.wav")
-        self.win = pygame.mixer.Sound("Assets/Audio/win.wav")
-        self.lose = pygame.mixer.Sound("Assets/Audio/lose.wav")
-        self.screen = pygame.display.get_surface() 
-        
         self.mainBoard = None
-
-        #For scoreboard
         self.__playerName = ""
-        
-        
+        self.screen = pygame.display.get_surface() 
+    
     #-------Initialise board------#
     def make_new_puzzle(self):
         self.mainBoard, self.solutionSeq = self.generateNewPuzzle(80)
@@ -94,15 +90,12 @@ class game():
                     #check if the user clicked on an option button?
                     if self.NEW_RECT.collidepoint(event.pos): #user clicked New button
                         if self.msg == 'Solved!':
-                            push(submitScore.submitScore(self.score))
-                            
+                            push(puzSubmitScore.submitScore(self.score))
                             #Random character selection
-                        else:
-                            self.CHAR = ('flo','geng','ghandi','henry','queen','cleo')
-                            self.RANDCHAR = random.choice(self.CHAR)
-                            self.moves = 0 
-                            self.randomNumber = random.randrange(100,150)
-                            self.make_new_puzzle()
+                        self.RANDCHAR = random.choice(self.CHAR)
+                        self.moves = 0
+                        self.make_new_puzzle()
+                        
                     elif self.RESET_RECT.collidepoint(event.pos):#user clicked Reset button
                         self.resetAnimation(self.mainBoard, self.allMoves) # clicked on Solve button
                         self.allMoves = []
@@ -110,11 +103,11 @@ class game():
                     elif self.EXIT_RECT.collidepoint(event.pos):
                         if top() is self:
                             pop()
+                            pop()
                     if self.moves >= self.randomNumber:
                         if self.SOLVE_RECT.collidepoint(event.pos):#user clicked Reset button
                             self.resetAnimation(self.mainBoard, self.solutionSeq + self.allMoves) # clicked on Solve button
-                            self.allMoves = []
-                            self.moves = 0                    
+                            self.allMoves = []                 
 
                 else:
                     #Check if the tile next to blank spot
@@ -149,6 +142,7 @@ class game():
                     self.slideTo = self.DOWN
                     self.TILESOUND.play()
                     self.moves += 1
+            
             elif event.type == QUIT:
                 sys.exit()
     
@@ -180,7 +174,7 @@ class game():
                 self.column.append(self.counter)
                 self.counter += self.BOARDWIDTH
             self.board.append(self.column)
-            self.counter -= self.BOARDWIDTH * (self.BOARDHEIGHT - 1) + self.BOARDWIDTH - 1 #what does this mean?
+            self.counter -= self.BOARDWIDTH * (self.BOARDHEIGHT - 1) + self.BOARDWIDTH - 1
             
         self.board[self.BOARDWIDTH-1][self.BOARDHEIGHT-1] = self.BLANK
         return self.board
@@ -248,17 +242,35 @@ class game():
         #pixels over determined by adjx and adjY
         self.left, self.top = self.getLeftTopOfTile(tilex, tiley)
         pygame.draw.rect(self.screen, self.BUTTONTEXTCOLOR, (self.left + adjx, self.top + adjy, self.TILESIZE, self.TILESIZE))
-        self.TILEIMAGE = pygame.image.load(os.path.join("Assets/images/Pictures/grid/" + self.RANDCHAR + "/l1/" + self.RANDCHAR + "_" + str(number - 1) + ".jpg"))
-        self.TILERECT = self.TILEIMAGE.get_rect()
-        self.TILERECT.center = self.left + int(self.TILESIZE / 2) + adjx, self.top + int(self.TILESIZE / 2) + adjy
-        self.screen.blit(self.TILEIMAGE, self.TILERECT)
         
-    def makeText(self, text, color, top, left):
+        if self.TILESIZE == 80:
+            self.TILEIMAGE = pygame.image.load(os.path.join("Assets/images/Pictures/grid/" + self.RANDCHAR + "/l1/" + self.RANDCHAR + "_" + str(number - 1) + ".jpg"))
+            self.TILERECT = self.TILEIMAGE.get_rect()
+            self.TILERECT.center = self.left + int(self.TILESIZE / 2) + adjx, self.top + int(self.TILESIZE / 2) + adjy
+            self.screen.blit(self.TILEIMAGE, self.TILERECT)
+        
+        elif self.TILESIZE == 64:
+            self.TILEIMAGE = pygame.image.load(os.path.join("Assets/images/Pictures/grid/" + self.RANDCHAR + "/l2/" + self.RANDCHAR + "_" + str(number - 1) + ".jpg"))
+            self.TILERECT = self.TILEIMAGE.get_rect()
+            self.TILERECT.center = self.left + int(self.TILESIZE / 2) + adjx, self.top + int(self.TILESIZE / 2) + adjy
+            self.screen.blit(self.TILEIMAGE, self.TILERECT)  
+        
+            
+    def makeText(self, text, color, size, top, left):
         #create the button objects
-        self.textSurf = self.BASICFONT.render(text, True, color)
-        self.textRect = self.textSurf.get_rect()
-        self.textRect.topleft = (top, left)
-        return (self.textSurf, self.textRect)
+        font = pygame.font.SysFont("monospace", size, bold=True, italic = False)
+        textSurf = font.render(text, True, color)
+        textRect = textSurf.get_rect()
+        textRect.topleft = (top, left)
+        return (textSurf, textRect)
+    
+    def makeTextCenter(self, text, color, size, centerx, height):
+        #create the button objects
+        font = pygame.font.SysFont("monospace", size, bold=True, italic = False)
+        textSurf = font.render(text, True, color)
+        textRect = textSurf.get_rect()
+        textRect.center = (centerx, height)
+        return (textSurf, textRect)
  
     def funFact(self, RANDCHAR):  
         pygame.draw.rect(self.screen, self.BORDERCOLOR, (20, 440, 1060, 250), 4)
@@ -303,57 +315,60 @@ class game():
         marginleft = 30
         yAxis = 530 
         
-        self.factTitle = self.BASICFONT.render('Did you know?...', 1, self.MESSAGECOLOR)
-        self.screen.blit(self.factTitle, (marginleft, 460))
+        factTitle, factTitleRect = self.makeText('Did you know?...', self.MESSAGECOLOR, 40, marginleft, 445)
+        self.screen.blit(factTitle, factTitleRect)
         
-        self.charName = self.BASICFONT.render(factList[RANDCHAR][0], 1, self.MESSAGECOLOR)
-        self.screen.blit(self.charName, (marginleft, 495))
+        charName, charNameRect = self.makeText(factList[RANDCHAR][0], self.MESSAGECOLOR, 40, marginleft, 480)
+        self.screen.blit(charName, charNameRect)
           
         for x in range(4):
             x += 1
-            self.factx = self.factFONT.render(factList[RANDCHAR][x],  1, self.MESSAGECOLOR)
-            self.screen.blit(self.factx, (marginleft, yAxis))
+            factx, factxRect = self.makeText(factList[RANDCHAR][x], self.MESSAGECOLOR, 30, marginleft, yAxis)
+            self.screen.blit(factx, factxRect)
             yAxis += 35
             
     def drawBoard(self, board, message, message2): 
         self.screen.blit(self.BGIMAGE, (0,0))
 
         if message:
-            self.background = self.screen
-            self.text = self.BASICFONT.render(message, 1, self.MESSAGECOLOR)
-            self.textpos = self.text.get_rect()
-            self.textpos.center = (self.WINDOWWIDTH/2, self.WINDOWHEIGHT/2 + 30)
-            self.screen.blit(self.text, self.textpos)
+            messageText, messageTextRect  = self.makeTextCenter(message, self.MESSAGECOLOR, 30, self.WINDOWWIDTH/2, self.WINDOWHEIGHT/2 + 30)
+            self.screen.blit(messageText, messageTextRect)
             
         if message2:
-            self.background = self.screen
-            self.text2 = self.BASICFONT.render(message2, 1, self.MESSAGECOLOR)
-            self.textpos = self.text2.get_rect()
-            self.textpos.center = (self.WINDOWWIDTH/2, self.WINDOWHEIGHT/2 + 55)
-            self.screen.blit(self.text2, self.textpos)
+           message2Text, message2TextRect  = self.makeTextCenter(message2, self.MESSAGECOLOR, 30, self.WINDOWWIDTH/2, self.WINDOWHEIGHT/2 + 55)
+           self.screen.blit(message2Text, message2TextRect)
             
         self.score = self.topScore - (self.moves * 10)
         
-        self.movesCount = self.BASICFONT.render("Score: " + str(self.score), 1, self.MESSAGECOLOR)
-        self.screen.blit(self.movesCount, (10,10))
+        movesCount, moveCountRect = self.makeText("Score:" + str(self.score), self.MESSAGECOLOR, 30, 10,10)
+        self.screen.blit(movesCount, moveCountRect)
         
-        for tilex in range(len(board)):
-            for tiley in range(len(board[0])):
-                if board[tilex][tiley]:     
-                    self.drawTile(tilex, tiley-2, board[tilex][tiley])
-                   
-        self.left, self.top = self.getLeftTopOfTile(0, -2)
+        if self.TILESIZE == 80: 
+            for tilex in range(len(board)):
+                for tiley in range(len(board[0])):
+                    if board[tilex][tiley]:
+                        self.drawTile(tilex, tiley-2, board[tilex][tiley])
+        
+            self.left, self.top = self.getLeftTopOfTile(0, -2)
+            
+        elif self.TILESIZE == 64: 
+            for tilex in range(len(board)):
+                for tiley in range(len(board[0])):
+                    if board[tilex][tiley]:             
+                        self.drawTile(tilex, tiley-2.5, board[tilex][tiley])
+            
+            self.left, self.top = self.getLeftTopOfTile(0, -2.5)
+        
         self.width = self.BOARDWIDTH * self.TILESIZE
         self.height = self.BOARDHEIGHT * self.TILESIZE
-        pygame.draw.rect(self.screen, self.BORDERCOLOR, (self.left - 8, self.top - 8, self.width + 20, self.height + 20), 11)
-        
+        pygame.draw.rect(self.screen, self.BORDERCOLOR, (self.left - 8, self.top -8, self.width + 20, self.height + 20), 11)
+                      
         self.screen.blit(self.RESET_SURF, self.RESET_RECT)
         self.screen.blit(self.NEW_SURF, self.NEW_RECT)
         self.screen.blit(self.EXIT_SURF, self.EXIT_RECT)
-        self.soundCheck(message)
-                  
+                          
         if self.moves >= self.randomNumber:
-            self.SOLVE_SURF, self.SOLVE_RECT = self.makeText('Solve Game', self.BUTTONTEXTCOLOR, 20, 100)
+            self.SOLVE_SURF, self.SOLVE_RECT = self.makeText('Solve Game', self.BUTTONTEXTCOLOR, 30, 20, 100)
             self.screen.blit(self.SOLVE_SURF, self.SOLVE_RECT)
         
         if message == 'Solved!':
@@ -363,74 +378,85 @@ class game():
         #This does not check if valid move....
         self.blankx, self.blanky = self.getBlankPosition(board)
         if direction == self.UP:
-            self.movex = self.blankx
-            self.movey = self.blanky + 1
+            movex = self.blankx
+            movey = self.blanky + 1
         elif direction == self.DOWN:
-            self.movex = self.blankx
-            self.movey = self.blanky - 1
+            movex = self.blankx
+            movey = self.blanky - 1
         elif direction == self.LEFT:
-            self.movex = self.blankx + 1
-            self.movey = self.blanky
+            movex = self.blankx + 1
+            movey = self.blanky
         elif direction == self.RIGHT:
-           self.movex = self.blankx - 1
-           self.movey = self.blanky
+            movex = self.blankx - 1
+            movey = self.blanky
 
         self.drawBoard(board, message, message2)
-        self.baseSurf = self.screen.copy()
+        baseSurf = self.screen.copy()
+        
         #Blank space over moving tile
-        self.moveLeft, self.moveTop = self.getLeftTopOfTile(self.movex, self.movey-2)
-        pygame.draw.rect(self.baseSurf, self.BGCOLOR, (self.moveLeft, self.moveTop, self.TILESIZE, self.TILESIZE)) 
-
+        if self.TILESIZE == 80:
+            moveLeft, moveTop = self.getLeftTopOfTile(movex, movey-2)
+        elif self.TILESIZE == 64:
+            moveLeft, moveTop = self.getLeftTopOfTile(movex, movey-2.5)
+            
+        pygame.draw.rect(baseSurf, self.BGCOLOR, (moveLeft, moveTop, self.TILESIZE, self.TILESIZE)) 
+        
         for i in range(0, self.TILESIZE, animationSpeed):
             #Animate the tile sliding over
-            self.screen.blit(self.baseSurf, (0, 0))
+            self.screen.blit(baseSurf, (0, 0))
             if direction == self.UP:
-                self.drawTile(self.movex, self.movey - 2, board[self.movex][self.movey], 0, -i)
+                if self.TILESIZE == 80:
+                    self.drawTile(movex, movey - 2, board[movex][movey], 0, -i)
+                elif self.TILESIZE == 64:
+                    self.drawTile(movex, movey - 2.5, board[movex][movey], 0, -i)
             if direction == self.DOWN:
-                self.drawTile(self.movex, self.movey - 2, board[self.movex][self.movey], 0, i)
+                if self.TILESIZE == 80:
+                    self.drawTile(movex, movey - 2, board[movex][movey], 0, i)
+                elif self.TILESIZE == 64:
+                    self.drawTile(movex, movey - 2.5, board[movex][movey], 0, i)
             if direction == self.LEFT:
-                self.drawTile(self.movex, self.movey - 2, board[self.movex][self.movey], -i, 0)
+                if self.TILESIZE == 80:
+                    self.drawTile(movex, movey - 2, board[movex][movey], -i, 0)
+                elif self.TILESIZE == 64:
+                    self.drawTile(movex, movey - 2.5, board[movex][movey], -i, 0)
             if direction == self.RIGHT:
-                self.drawTile(self.movex, self.movey - 2, board[self.movex][self.movey], i, 0)
-        
-            pygame.display.update()
+                if self.TILESIZE == 80:
+                    self.drawTile(movex, movey - 2, board[movex][movey], i, 0)
+                elif self.TILESIZE == 64:
+                    self.drawTile(movex, movey - 2.5, board[movex][movey], i, 0)
+            
+            pygame.display.flip()
             self.FPSCLOCK = pygame.time.Clock()
             self.FPSCLOCK.tick(60)
     
     def generateNewPuzzle(self, numSlides):        
         #numSlides is the number of moves and this function will animate these moves
-        self.sequence = []
-        self.board = self.getStartingBoard()
-        self.drawBoard(self.board, '', '')
-        pygame.time.wait(500) #Pause for 500 milliseconds for effect
-        self.lastMove = None
+        sequence = []
+        board = self.getStartingBoard()
+        self.drawBoard(board, '', '')
+        #pygame.time.wait(5) #Pause for 500 milliseconds for effect
+        lastMove = None
         for i in range(numSlides):
-            self.move = self.getRandomMove(self.board, self.lastMove)
-            self.slideAnimation(self.board, self.move, 'Generating new puzzle...', '',  animationSpeed=int(self.TILESIZE / 2))
-            self.makeMove(self.board, self.move)
-            self.sequence.append(self.move)
-            self.lastMove = self.move
-        return (self.board, self.sequence)
+            move = self.getRandomMove(board, lastMove)
+            self.slideAnimation(board, move, 'Generating new puzzle...', '',  animationSpeed=int(self.TILESIZE / 2))
+            self.makeMove(board, move)
+            sequence.append(move)
+            lastMove = move
+        return (board, sequence)
     
     def resetAnimation(self, board, allMoves):
         #reverse allMoves
-        self.revAllMoves = allMoves[:]
-        self.revAllMoves.reverse()
-        for move in self.revAllMoves:
+        revAllMoves = allMoves[:]
+        revAllMoves.reverse()
+        for move in revAllMoves:
             if move == self.UP:
-                self.oppositeMove = self.DOWN
+                oppositeMove = self.DOWN
             elif move == self.DOWN:
-                self.oppositeMove = self.UP
+                oppositeMove = self.UP
             elif move == self.LEFT:
-                self.oppositeMove = self.RIGHT
+                oppositeMove = self.RIGHT
             elif move == self.RIGHT:
-                self.oppositeMove = self.LEFT
+                oppositeMove = self.LEFT
                 
-            self.slideAnimation(board, self.oppositeMove, '', '',animationSpeed=int(self.TILESIZE / 2 ))
-            self.makeMove(board, self.oppositeMove)
-            
-    def soundCheck(self, message):
-        if message == "Solved!":
-            self.win.play(0)
-        if self.score == 0:
-            self.lose.play(0)
+            self.slideAnimation(board, oppositeMove, '', '',animationSpeed=int(self.TILESIZE / 2 ))
+            self.makeMove(board, oppositeMove)
