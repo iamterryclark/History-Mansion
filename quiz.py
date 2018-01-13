@@ -2,10 +2,9 @@
 #quiz.py Created By Terry Clark
 #Released under a "Simplified BSD" License
 
-import pygame, os, sys, random, quizSubmitScore, winLoseDisplay
+import pygame, os, sys, random, submitScore, winLoseDisplay
 from context import *
 from pygame.locals import *
-from decimal import ROUND_UP
 
 class quiz:
     
@@ -40,6 +39,12 @@ class quiz:
 
         self.screen = pygame.display.get_surface()
         
+        #This is to display the player name to the screen whilst they type
+        self.__playerName = ""
+        
+        #This is for the highscore submit
+        self.puzOrQuiz = "quiz"
+        
     #/---Event loop function---\#
     def update(self, dt):
         for event in pygame.event.get():
@@ -49,19 +54,16 @@ class quiz:
                         pop()
                         
                 #User presses character images to answer question
-                if self.ansImgRect1.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[0])
-                elif self.ansImgRect2.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[1])
-                elif self.ansImgRect3.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[2])
-                elif self.ansImgRect4.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[3])
-                elif self.ansImgRect5.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[4])
-                elif self.ansImgRect6.collidepoint(event.pos):
-                    self.checkAns(self.CHAR[5])  
-            
+                for z in range(6):
+                    if self.ansImgRectList[z-1].collidepoint(event.pos):
+                        self.checkAns(self.CHAR[z-1])
+                    #End quiz conditional
+                if self.questNum > 22:
+                    push(submitScore.submitScore(self.quizScore, self.puzOrQuiz))
+                    self.questNum = 1
+                    self.quizScore = 0
+                    self.percent = 0
+              
             #Escaping the game
             elif event.type == KEYUP:
                 if event.key == K_ESCAPE:
@@ -79,13 +81,6 @@ class quiz:
         pygame.draw.rect(self.screen, self.BLACK, (0, 180, self.WINDOWWIDTH, 300))
 
         self.scoreText, self.scoreTextRect = self.makeTextCenter("Score: " + str(self.quizScore), self.WHITE, 40, (self.WINDOWWIDTH/2), 500)        
-
-        #End quiz conditional
-        if self.questNum == 23:
-            push(quizSubmitScore.submitScore(self.quizScore))
-            self.questNum = 1
-            self.quizScore = 0
-            self.percent = 0
             
         #Display quest and answer
         self.QandAList()
@@ -155,24 +150,20 @@ class quiz:
         x = 0 
         xadj = 140 
         y = 350
+            
+        self.ansImgList = []
+        self.ansImgRectList = []
         
-        #for z in range(6):
-        #    self.ansImgz, self.ansImgRectz = self.imgClickSurf(imgLocation + self.CHAR[z-1] + ".jpg", (x + xadj), y)
-        #    x += 140
-        
-        self.ansImg1, self.ansImgRect1 = self.imgClickSurf(imgLocation + self.CHAR[0] + ".jpg", (x + xadj), y)
-        self.ansImg2, self.ansImgRect2 = self.imgClickSurf(imgLocation + self.CHAR[1] + ".jpg", (x + xadj * 2), y)
-        self.ansImg3, self.ansImgRect3 = self.imgClickSurf(imgLocation + self.CHAR[2] + ".jpg", (x + xadj * 3), y)
-        self.ansImg4, self.ansImgRect4 = self.imgClickSurf(imgLocation + self.CHAR[3] + ".jpg", (x + xadj * 4), y)
-        self.ansImg6, self.ansImgRect6 = self.imgClickSurf(imgLocation + self.CHAR[5] + ".jpg", (x + xadj * 6), y)
-        self.ansImg5, self.ansImgRect5 = self.imgClickSurf(imgLocation + self.CHAR[4] + ".jpg", (x + xadj * 5), y)
-           
-        self.screen.blit(self.ansImg1, self.ansImgRect1)
-        self.screen.blit(self.ansImg2, self.ansImgRect2)
-        self.screen.blit(self.ansImg3, self.ansImgRect3)
-        self.screen.blit(self.ansImg4, self.ansImgRect4)
-        self.screen.blit(self.ansImg5, self.ansImgRect5)
-        self.screen.blit(self.ansImg6, self.ansImgRect6)
+        for z in range(6):
+            
+            self.ansImgList.append("self.ansImg" + str(z-1))
+            self.ansImgRectList.append("self.ansImgRect" + str(z-1)) 
+            
+        for z in range(6):  
+            self.ansImgList[z-1], self.ansImgRectList[z-1] = self.imgClickSurf(imgLocation + self.CHAR[z-1] + ".jpg", (x + xadj), y)
+            x += 140
+            
+            self.screen.blit(self.ansImgList[z-1], self.ansImgRectList[z-1])
     
     def imgClickSurf (self, img, top, left):
         image = pygame.image.load(os.path.join(img))
@@ -183,8 +174,8 @@ class quiz:
     def checkAns(self, char):
         if char == self.questList[self.randQuestSel][1]:
             self.quizScore += 10
-            self.questNum += 1
             self.randQuestSel = random.choice(range(23))
+            self.questNum += 1
             isCorrect = True
             push(winLoseDisplay.winLoseDisplay(isCorrect))
             

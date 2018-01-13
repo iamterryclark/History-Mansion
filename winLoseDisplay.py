@@ -2,10 +2,9 @@
 #scoreBoard Created by Terry Clark 
 #Released under a "Simplified BSD" License
 
-import pygame, sys, main, quiz
+import pygame, sys
 from context import *
 from pygame.locals import *
-import time
 
 class winLoseDisplay():
 

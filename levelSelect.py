@@ -2,10 +2,9 @@
 #scoreBoard Created by Terry Clark 
 #Released under a "Simplified BSD" License
 
-import pygame, sys, quiz
+import pygame, sys, game
 from context import *
 from pygame.locals import *
-import time
 
 class levelSelect():
 
@@ -27,9 +26,9 @@ class levelSelect():
         for event in pygame.event.get(): 
             if event.type == MOUSEBUTTONUP:
                 if self.easyRect.collidepoint(event.pos):
-                   push(game.game(80, 4, 4))
+                    push(game.game(80, 4, 4))
                 if self.hardRect.collidepoint(event.pos):
-                   push(game.game(64, 5, 5))
+                    push(game.game(64, 5, 5))
                     
             elif event.type == KEYUP:
                 if event.key == K_ESCAPE:

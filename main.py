@@ -2,7 +2,7 @@
 #main.py created by Terry Clark
 #Released under a "Simplified BSD" License
 
-import pygame, startScreen, game, scoreBoard
+import pygame, startScreen
 from context import *
 from pygame.locals import *
 
@@ -14,11 +14,10 @@ def run():
     screen = pygame.display.set_mode(resolution)
 
     clock = pygame.time.Clock()
-    max_fps = 0
 
-    push(startScreen.startScreen())
+    push(startScreen.startScreen(screen))
     while top():
-        dt = clock.tick(max_fps) / 1000.0
+        dt = clock.tick(1000)
 
         top_context = top()
         if top_context:

@@ -2,13 +2,13 @@
 #startScreen.py Created by Terry Clark 
 #Released under a "Simplified BSD" License
 
-import pygame, sys, levelSelect, scoreBoard, quiz
+import pygame, sys, levelSelect, quiz, scoreBoard
 from context import *
 from pygame.locals import *
 
 class startScreen():
     
-    def __init__(self):
+    def __init__(self, screen):
         #Screen Size
         self.WINDOWWIDTH = 1100
         self.WINDOWHEIGHT = 700
@@ -32,7 +32,7 @@ class startScreen():
         self.EXIT_SURF, self.EXIT_RECT = self.makeText('Exit', self.BUTTONTEXTCOLOR, 40, self.WINDOWWIDTH/2, 550)
         self.startSOUND.play()
         
-        self.DISPLAYSURF = pygame.display.get_surface()
+        self.screen = screen
         
     #/---Event loop function---\#
     def update(self, dt):
@@ -60,11 +60,11 @@ class startScreen():
     #/-----Draw to screen-----\#
     def draw(self, dt): 
         # Blit (Show) everything to the screen
-        self.DISPLAYSURF.blit(self.BGIMAGE, (0, 0))
-        self.DISPLAYSURF.blit(self.START_SURF, self.START_RECT)
-        self.DISPLAYSURF.blit(self.SCOREBOARD_SURF, self.SCOREBOARD_RECT)
-        self.DISPLAYSURF.blit(self.QUIZ_SURF, self.QUIZ_RECT)
-        self.DISPLAYSURF.blit(self.EXIT_SURF, self.EXIT_RECT)
+        self.screen.blit(self.BGIMAGE, (0, 0))
+        self.screen.blit(self.START_SURF, self.START_RECT)
+        self.screen.blit(self.SCOREBOARD_SURF, self.SCOREBOARD_RECT)
+        self.screen.blit(self.QUIZ_SURF, self.QUIZ_RECT)
+        self.screen.blit(self.EXIT_SURF, self.EXIT_RECT)
         
         pygame.display.flip()      
     

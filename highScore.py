@@ -9,7 +9,11 @@ import operator
 
 class Highscore:
     
-    def __init__(self):
+    def __init__(self, puzOrQuiz):
+        self.puzOrQuiz = puzOrQuiz
+        self.puzHS = "Assets/data/puzHighScore.dat"
+        self.quizHS = "Assets/data/quizHighScore.dat"
+        
         self.__highscore = self.load()
     
     def getScores(self):
@@ -17,7 +21,13 @@ class Highscore:
     
     def load(self):
         highscore = []
-        for line in fileinput.input("highscore.dat"):
+        
+        if self.puzOrQuiz == "puz":
+            self.HS = self.puzHS
+        elif self.puzOrQuiz == "quiz":
+            self.HS = self.quizHS
+        
+        for line in fileinput.input(self.HS):
             name, score, md5 = line.split('[::]')
             md5 = md5.replace('\n', '')
             
@@ -33,7 +43,7 @@ class Highscore:
         hash = hashlib.md5((str(name+str(score)+"pygame")).encode("utf-8"))
         self.__highscore.append([name, str(score), hash.hexdigest()])
         
-        f = open("highscore.dat", "w")
+        f = open(self.HS, "w")
         for name, score, md5 in self.__highscore:
             f.write(str(name)+"[::]" + str(score)+"[::]" + str(md5)+"\n")
             

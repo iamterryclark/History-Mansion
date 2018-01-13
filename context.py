@@ -2,9 +2,6 @@
 #context.py created by Terry Clark
 #Released under a "Simplified BSD" License
 
-import pygame, main, startScreen, game, scoreBoard
-from pygame.locals import *
-
 def push(top_context):
     game_stack.append(top_context)
     print('Context: pushed {}'.format(top_context))

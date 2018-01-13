@@ -3,9 +3,8 @@
 #Original Source: http://inventwithpython.com/slidepuzzle.py by Al Sweigart
 #Released under a "Simplified BSD" License
 
-import pygame, sys, random, os, pygame.mixer, startScreen, puzSubmitScore, quizSubmitScore
+import sys, random, os, pygame.mixer, submitScore
 from context import *
-import time
 from pygame.locals import *
  
 class game():
@@ -26,6 +25,7 @@ class game():
         
         self.BUTTONTEXTCOLOR = Color(255,255,255)
         self.MESSAGECOLOR = Color(255,255,255)
+        self.MESSAGECOLOR2 = Color(240,240,20)
             
         #Score Calculations and Move Count
         self.moves = 0
@@ -61,8 +61,13 @@ class game():
         self.RIGHT = 'right'
         
         self.mainBoard = None
+        self.screen = pygame.display.get_surface()
+        
+        #This is to display the player name to the screen whilst they type
         self.__playerName = ""
-        self.screen = pygame.display.get_surface() 
+        
+        #This is for the highscore submit
+        self.puzOrQuiz = "puz"
     
     #-------Initialise board------#
     def make_new_puzzle(self):
@@ -76,11 +81,11 @@ class game():
             self.make_new_puzzle()
             
         self.slideTo = None
-        self.msg = 'Click tile or use arrows to slide.'
-        self.msg2 = 'Solve the puzzle to release the facts!' #message to display in message box
+        self.msg = 'Use keyboard arrows to slide the tiles'
+        self.msg2 = '^^^^^^^^Solve the puzzle to release the facts!^^^^^^^^' #message to display in message box
         if self.mainBoard == self.SOLVEDBOARD:
-            self.msg = 'Solved!'
-            self.msg2 = "Click 'New Game' to submit your score and start a new game" 
+            self.msg = 'YOU DID IT!'
+            self.msg2 = "Click New Game to save score"
                        
         for event in pygame.event.get():
             if event.type == MOUSEBUTTONUP:
@@ -89,9 +94,9 @@ class game():
                 if (self.spotx, self.spoty) == (None, None):
                     #check if the user clicked on an option button?
                     if self.NEW_RECT.collidepoint(event.pos): #user clicked New button
-                        if self.msg == 'Solved!':
-                            push(puzSubmitScore.submitScore(self.score))
-                            #Random character selection
+                        if self.mainBoard == self.SOLVEDBOARD:
+                            push(submitScore.submitScore(self.score, self.puzOrQuiz))
+                            #Random character selection  
                         self.RANDCHAR = random.choice(self.CHAR)
                         self.moves = 0
                         self.make_new_puzzle()
@@ -126,6 +131,7 @@ class game():
                 if event.key == K_ESCAPE:
                     if top() is self:
                         pop()
+                        pop()
                 elif event.key in (K_LEFT, K_a) and self.isValidMove(self.mainBoard, self.LEFT):
                     self.slideTo = self.LEFT
                     self.TILESOUND.play()
@@ -147,13 +153,12 @@ class game():
                 sys.exit()
     
         if self.slideTo:
-            self.slideAnimation(self.mainBoard, self.slideTo, 'Click tile or use arrows to slide.', 'Solve the puzzle to release the facts!',  8) #show slide on screen
+            self.slideAnimation(self.mainBoard, self.slideTo, 'Use keyboard arrows to slide the tiles', '^^^^^^^^Solve the puzzle to release the facts!^^^^^^^^',  8) #show slide on screen
             self.makeMove(self.mainBoard, self.slideTo)
             self.allMoves.append(self.slideTo) #records the slide
     
     #/-----Draw to screen-----\#                
     def draw(self, dt):
-        screen = pygame.display.get_surface() 
         self.drawBoard(self.mainBoard, self.msg, self.msg2)
         pygame.display.flip()
         
@@ -273,13 +278,13 @@ class game():
         return (textSurf, textRect)
  
     def funFact(self, RANDCHAR):  
-        pygame.draw.rect(self.screen, self.BORDERCOLOR, (20, 440, 1060, 250), 4)
+        pygame.draw.rect(self.screen, self.BORDERCOLOR, (20, 410, 1060, 220), 4)
         
         factList =  { "cleo" : ("Cleopatra" ,
                         "1: Ruled Egypt from 51 BC - 30 BC", 
-                        "2: Was daughter of Pharaoh Ptolemy XII Auletes", 
+                        "2: Was the daughter of Pharaoh Ptolemy XII Auletes", 
                         "3: Her father was King Ptolemy XII", 
-                        "4: Died in after her son commit suicide in 30 BC" ),
+                        "4: Killed herself after her son commit suicide in 30 BC" ),
                     
                     "geng" : ("Ghengis Khan",
                         "1: Was thought to be born in 1162 AD and died on 18th August 1227",
@@ -294,7 +299,7 @@ class game():
                         "4: Was killed on January 30, 1948" ),
                     
                     "henry" : ("Henry VIII",
-                        "1: Was born in 1491 (Tudor Age)",
+                        "1: Was born in 1491 aka the 'Tudor Age'",
                         "2: Had six wives and was the King of England",
                         "3: People who made him cross risked having their heads chopped off!",
                         "4: Died in 1547" ),
@@ -303,7 +308,7 @@ class game():
                         "1: Was born in 1819",
                         "2: Became Queen in 1837 when she was 18",
                         "3: Had a long period of history is named after her - the Victorian Age",
-                        "4: Lived to see the start of the 20th century, dying in January 1901." ),
+                        "4: Lived to see the start of the 20th century and died in January 1901." ),
                     
                     "flo" : ("Florence Knightingale",
                         "1: Was born in 1820, prior to the steam railway",
@@ -313,17 +318,17 @@ class game():
         }
         
         marginleft = 30
-        yAxis = 530 
+        yAxis = 500 
         
-        factTitle, factTitleRect = self.makeText('Did you know?...', self.MESSAGECOLOR, 40, marginleft, 445)
+        factTitle, factTitleRect = self.makeText('Did you know?...', self.MESSAGECOLOR, 40, marginleft, 415)
         self.screen.blit(factTitle, factTitleRect)
         
-        charName, charNameRect = self.makeText(factList[RANDCHAR][0], self.MESSAGECOLOR, 40, marginleft, 480)
+        charName, charNameRect = self.makeText(factList[RANDCHAR][0], self.MESSAGECOLOR, 40, marginleft, 450)
         self.screen.blit(charName, charNameRect)
           
         for x in range(4):
             x += 1
-            factx, factxRect = self.makeText(factList[RANDCHAR][x], self.MESSAGECOLOR, 30, marginleft, yAxis)
+            factx, factxRect = self.makeText(factList[RANDCHAR][x], self.MESSAGECOLOR, 20, marginleft, yAxis)
             self.screen.blit(factx, factxRect)
             yAxis += 35
             
@@ -335,12 +340,15 @@ class game():
             self.screen.blit(messageText, messageTextRect)
             
         if message2:
-           message2Text, message2TextRect  = self.makeTextCenter(message2, self.MESSAGECOLOR, 30, self.WINDOWWIDTH/2, self.WINDOWHEIGHT/2 + 55)
-           self.screen.blit(message2Text, message2TextRect)
+            message2Text, message2TextRect  = self.makeTextCenter(message2, self.MESSAGECOLOR2, 30, self.WINDOWWIDTH/2, self.WINDOWHEIGHT - 30)
+            self.screen.blit(message2Text, message2TextRect)
             
         self.score = self.topScore - (self.moves * 10)
         
-        movesCount, moveCountRect = self.makeText("Score:" + str(self.score), self.MESSAGECOLOR, 30, 10,10)
+        scoreText, scoreRect = self.makeText("Score: ", self.MESSAGECOLOR, 40, 10, 10)
+        self.screen.blit(scoreText, scoreRect)
+        
+        movesCount, moveCountRect = self.makeText(str(self.score), self.MESSAGECOLOR2, 40, 150,10)
         self.screen.blit(movesCount, moveCountRect)
         
         if self.TILESIZE == 80: 
@@ -371,7 +379,7 @@ class game():
             self.SOLVE_SURF, self.SOLVE_RECT = self.makeText('Solve Game', self.BUTTONTEXTCOLOR, 30, 20, 100)
             self.screen.blit(self.SOLVE_SURF, self.SOLVE_RECT)
         
-        if message == 'Solved!':
+        if message == "YOU DID IT!":
             self.funFact(self.RANDCHAR)
         
     def slideAnimation(self, board, direction, message, message2, animationSpeed):

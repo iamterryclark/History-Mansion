@@ -2,7 +2,7 @@
 #scoreBoard Created by Terry Clark 
 #Released under a "Simplified BSD" License
 
-import pygame, sys, startScreen, puzHighScore, quizHighScore
+import pygame, sys, highScore
 from context import *
 from pygame.locals import *
 
@@ -57,8 +57,8 @@ class scoreBoard():
         TITLE, TITLERECT = self.makeText('Hall of fame!', self.BLACK, 40, 410, 110)
         self.screen.blit(TITLE, TITLERECT)
         
-        puzHighScoreObj = puzHighScore.Highscore()
-        quizHighScoreObj = quizHighScore.Highscore()
+        puzHighScoreObj = highScore.Highscore("puz")
+        quizHighScoreObj = highScore.Highscore("quiz")
         
         puzTitle, puzTitleRect = self.makeText("Puzzle Score", self.BLACK, 30, 190, 170)
         self.screen.blit(puzTitle, puzTitleRect)
@@ -69,9 +69,6 @@ class scoreBoard():
         x = 150
         y = 210
         
-        x2 = 650
-        y2 = 210
-        
         for score in puzHighScoreObj.getScores():         
             
             puzPlayerName, puzPlayerRect = self.makeText(score[0], self.BLACK, 30, x, y)
@@ -81,6 +78,9 @@ class scoreBoard():
             self.screen.blit(puzPlayerScore, puzPlayerScoreRect) 
             
             y += 30
+        
+        x2 = 650
+        y2 = 210
             
         for score2 in quizHighScoreObj.getScores():
             

@@ -2,14 +2,13 @@
 #submitScore.py Created by Terry Clark
 #Released under a "Simplified BSD" License
 
-import pygame, sys, game, main, highScore
-import random
+import pygame, sys, highScore
 from context import *
 from pygame.locals import *
 
 class submitScore():
     
-    def __init__(self, score):
+    def __init__(self, score, puzOrQuiz):
         self.WINDOWWIDTH = 1100
         self.WINDOWHEIGHT = 700
 
@@ -30,6 +29,7 @@ class submitScore():
         
         self.__playerName = ""
         self.score = score
+        self.puzOrQuiz = puzOrQuiz
         
     #/---Event loop function---\#
     def update(self, dt):
@@ -39,7 +39,7 @@ class submitScore():
             
             elif event.type == KEYDOWN:
                 if event.key == pygame.K_RETURN:
-                    highScore.Highscore().add(self.__playerName, self.score)
+                    highScore.Highscore(self.puzOrQuiz).add(self.__playerName, self.score)
 
                     if top() is self:
                         pop()
